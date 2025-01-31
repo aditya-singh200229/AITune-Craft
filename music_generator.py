@@ -1,12 +1,17 @@
 import random
 from midiutil import MIDIFile
 
-# MIDI drum note numbers
+# MIDI drum note numbers (General MIDI drum map)
 DRUM_NOTES = {
-    'kick': 36,
-    'snare': 38,
-    'hihat': 42,
-    'ride': 51
+    'kick': 36,        # Bass Drum 1
+    'snare': 38,       # Acoustic Snare
+    'hihat_closed': 42,  # Closed Hi-Hat
+    'hihat_open': 46,    # Open Hi-Hat
+    'crash': 49,       # Crash Cymbal 1
+    'ride': 51,        # Ride Cymbal 1
+    'tom_high': 50,    # High Tom
+    'tom_mid': 47,     # Mid Tom
+    'tom_low': 43      # Low Tom
 }
 
 def get_scale(key='C', scale_type='major', octaves=2, base_octave=4):
@@ -58,22 +63,26 @@ def note_to_midi_number(note, octave):
     return 60 + notes[note] + (octave - 4) * 12
 
 def generate_drum_pattern(measures=8, time_signature=4):
-    """Generate a more varied drum pattern."""
+    """Generate a more varied drum pattern with full drum kit."""
     pattern = []
     for measure in range(measures):
         base_time = measure * time_signature
 
-        # Basic pattern variations
+        # Basic pattern variations with full drum kit
         patterns = [
-            # Standard pattern
-            [('kick', 0), ('hihat', 0), ('snare', 1), ('hihat', 1),
-             ('kick', 2), ('hihat', 2), ('snare', 3), ('hihat', 3)],
+            # Standard rock pattern
+            [('kick', 0), ('hihat_closed', 0), ('snare', 1), ('hihat_closed', 1),
+             ('kick', 2), ('hihat_closed', 2), ('snare', 3), ('hihat_closed', 3),
+             ('crash', 0)],  # Crash on measure start
+
             # Syncopated pattern
-            [('kick', 0), ('hihat', 0.5), ('snare', 1), ('hihat', 1.5),
-             ('kick', 2), ('hihat', 2.5), ('snare', 3), ('hihat', 3.5)],
-            # Variation with extra kicks
-            [('kick', 0), ('hihat', 0), ('kick', 0.5), ('snare', 1),
-             ('hihat', 2), ('kick', 2.5), ('snare', 3), ('hihat', 3)]
+            [('kick', 0), ('hihat_closed', 0.5), ('snare', 1), ('hihat_open', 1.5),
+             ('kick', 2), ('hihat_closed', 2.5), ('snare', 3), ('ride', 3.5),
+             ('tom_high', 3.75)],
+
+            # Fill pattern
+            [('kick', 0), ('snare', 1), ('tom_high', 2), ('tom_mid', 2.25),
+             ('tom_low', 2.5), ('snare', 3), ('crash', 3.75)]
         ]
 
         # Choose a random pattern for this measure
@@ -95,7 +104,12 @@ def generate_midi(filename, tempo=120, key='C', scale_type='major', base_octave=
     for track in range(3):
         midi.addTempo(track, time, tempo)
         # Set different instruments for each track
-        midi.addProgramChange(track, 0, 0, 0 if track == 0 else 48 if track == 1 else 0)
+        if track == 0:
+            midi.addProgramChange(track, 0, 0, 0)  # Piano for melody
+        elif track == 1:
+            midi.addProgramChange(track, 0, 0, 48)  # Strings for chords
+        else:
+            midi.addProgramChange(track, 9, 0, 0)  # Standard drum kit
 
     # Get scale notes and total duration
     scale = get_scale(key, scale_type, octaves=2, base_octave=base_octave)
