@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const generateBtn = document.getElementById('generateBtn');
+    const generateMidiBtn = document.getElementById('generateMidiBtn');
+    const generateMp3Btn = document.getElementById('generateMp3Btn');
     const previewBtn = document.getElementById('previewBtn');
     const progressBar = document.getElementById('progressBar');
     const tempoSlider = document.getElementById('tempo');
@@ -10,31 +11,32 @@ document.addEventListener('DOMContentLoaded', () => {
         tempoValue.textContent = `${e.target.value} BPM`;
     });
 
-    generateBtn.addEventListener('click', async () => {
+    const getParams = () => new URLSearchParams({
+        key: document.getElementById('key').value,
+        scale: document.getElementById('scale').value,
+        tempo: document.getElementById('tempo').value,
+        genre: document.getElementById('genre').value
+    });
+
+    const handleDownload = async (endpoint, format) => {
         try {
-            generateBtn.disabled = true;
+            generateMidiBtn.disabled = true;
+            generateMp3Btn.disabled = true;
             progressBar.style.width = '50%';
 
-            const params = new URLSearchParams({
-                key: document.getElementById('key').value,
-                scale: document.getElementById('scale').value,
-                tempo: document.getElementById('tempo').value,
-                genre: document.getElementById('genre').value
-            });
-
-            const response = await fetch(`/generate?${params.toString()}`, {
+            const response = await fetch(`/${endpoint}?${getParams().toString()}`, {
                 method: 'POST',
             });
 
             if (!response.ok) {
-                throw new Error('Generation failed');
+                throw new Error(`Generation failed`);
             }
 
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'generated_music.mid';
+            a.download = `generated_music.${format}`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -43,14 +45,18 @@ document.addEventListener('DOMContentLoaded', () => {
             progressBar.style.width = '100%';
         } catch (error) {
             console.error('Error:', error);
-            alert('Failed to generate music');
+            alert(`Failed to generate ${format.toUpperCase()} file`);
         } finally {
-            generateBtn.disabled = false;
+            generateMidiBtn.disabled = false;
+            generateMp3Btn.disabled = false;
             setTimeout(() => {
                 progressBar.style.width = '0%';
             }, 1000);
         }
-    });
+    };
+
+    generateMidiBtn.addEventListener('click', () => handleDownload('generate', 'mid'));
+    generateMp3Btn.addEventListener('click', () => handleDownload('generate-mp3', 'mp3'));
 
     previewBtn.addEventListener('click', () => {
         const key = document.getElementById('key').value;

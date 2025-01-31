@@ -52,18 +52,27 @@
                         </select>
                     </div>
 
-                    <div class="progress">
+                    <div class="progress mb-3">
                         <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
                              role="progressbar" style="width: 0%"></div>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button id="previewBtn" class="btn btn-secondary btn-icon">
-                            <i class="bi bi-play-circle"></i> Preview
-                        </button>
-                        <button id="generateBtn" class="btn btn-primary btn-icon">
-                            <i class="bi bi-download"></i> Generate MIDI
-                        </button>
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <button id="previewBtn" class="btn btn-secondary w-100 btn-icon">
+                                <i class="bi bi-play-circle"></i> Preview
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="generateMidiBtn" class="btn btn-primary w-100 btn-icon">
+                                <i class="bi bi-file-earmark-music"></i> Download MIDI
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="generateMp3Btn" class="btn btn-success w-100 btn-icon">
+                                <i class="bi bi-file-earmark-music"></i> Download MP3
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
