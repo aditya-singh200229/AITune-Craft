@@ -52,20 +52,48 @@ def generate_mp3():
         with tempfile.NamedTemporaryFile(suffix='.mid', delete=False) as midi_file:
             generate_music_file(midi_file.name, request.args)
 
-            # Convert MIDI to WAV using FluidSynth
-            mp3_path = midi_file.name.replace('.mid', '.mp3')
-            logging.debug(f"Converting {midi_file.name} to {mp3_path}")
+            # Generate WAV file first
+            wav_path = midi_file.name.replace('.mid', '.wav')
+            logging.debug(f"Converting {midi_file.name} to {wav_path}")
 
-            subprocess.run([
-                'fluidsynth',
-                '-ni',
-                '/usr/share/sounds/sf2/FluidR3_GM.sf2',
-                midi_file.name,
-                '-F',
-                mp3_path,
-                '-r',
-                '44100'
-            ], check=True)
+            # Try different soundfont paths
+            soundfont_paths = [
+                '/usr/share/soundfonts/default.sf2',
+                '/usr/share/sounds/sf2/default.sf2',
+                '/usr/local/share/soundfonts/default.sf2'
+            ]
+
+            for soundfont in soundfont_paths:
+                if os.path.exists(soundfont):
+                    logging.debug(f"Using soundfont: {soundfont}")
+                    subprocess.run([
+                        'fluidsynth',
+                        '-ni',
+                        soundfont,
+                        midi_file.name,
+                        '-F',
+                        wav_path,
+                        '-r',
+                        '44100'
+                    ], check=True)
+                    break
+            else:
+                # If no soundfont found, create a simple WAV file
+                logging.warning("No soundfont found, creating basic WAV")
+                subprocess.run([
+                    'fluidsynth',
+                    '-ni',
+                    midi_file.name,
+                    '-F',
+                    wav_path,
+                    '-r',
+                    '44100'
+                ], check=True)
+
+            # Convert WAV to MP3
+            mp3_path = wav_path.replace('.wav', '.mp3')
+            logging.debug(f"Converting {wav_path} to {mp3_path}")
+            subprocess.run(['ffmpeg', '-i', wav_path, '-b:a', '192k', mp3_path], check=True)
 
             return send_file(
                 mp3_path,
