@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     generateBtn.addEventListener('click', async () => {
         try {
             generateBtn.disabled = true;
+            generateBtn.classList.add('btn-generating');
+            generateBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Generating...';
             playBtn.disabled = true;
             stopBtn.disabled = true;
             downloadBtn.disabled = true;
@@ -64,6 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Failed to generate music');
         } finally {
             generateBtn.disabled = false;
+            generateBtn.classList.remove('btn-generating');
+            generateBtn.innerHTML = '<i class="bi bi-magic"></i> Generate New Music';
             setTimeout(() => {
                 progressBar.style.width = '0%';
             }, 1000);
@@ -132,6 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             isPlaying = true;
             playBtn.innerHTML = '<i class="bi bi-pause-circle"></i> Pause';
+            playBtn.classList.remove('btn-success');
+            playBtn.classList.add('btn-warning');
             stopBtn.disabled = false;
         } else {
             stopPlayback();
@@ -148,6 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         isPlaying = false;
         playBtn.innerHTML = '<i class="bi bi-play-circle"></i> Play';
+        playBtn.classList.remove('btn-warning');
+        playBtn.classList.add('btn-success');
         stopBtn.disabled = true;
     };
 

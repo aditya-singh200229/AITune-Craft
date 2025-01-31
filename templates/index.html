@@ -11,15 +11,19 @@
 <body>
     <div class="container py-5">
         <header class="text-center mb-5">
-            <h1><i class="bi bi-music-note-beamed"></i> AI Music Generator</h1>
-            <p class="lead">Create unique MIDI compositions using music theory</p>
+            <h1 class="site-title mb-2">
+                <i class="bi bi-music-note-beamed"></i> AI Music Generator
+            </h1>
+            <p class="lead text-secondary">Create unique MIDI compositions using advanced music theory</p>
         </header>
 
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-lg-8 col-xl-7">
                 <div class="music-controls">
                     <div class="parameter-group">
-                        <label for="genre" class="form-label">Genre</label>
+                        <label for="genre" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-music-note"></i> Genre
+                        </label>
                         <select class="form-select" id="genre">
                             <option value="classical">Classical</option>
                             <option value="jazz">Jazz</option>
@@ -28,15 +32,19 @@
                     </div>
 
                     <div class="parameter-group">
-                        <label for="tempo" class="form-label">Tempo (BPM)</label>
+                        <label for="tempo" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-speedometer2"></i> Tempo
+                        </label>
                         <input type="range" class="form-range" id="tempo" min="60" max="180" value="120">
-                        <div class="text-center" id="tempoValue">120 BPM</div>
+                        <div class="text-center text-secondary" id="tempoValue">120 BPM</div>
                     </div>
 
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="parameter-group">
-                                <label for="key" class="form-label">Key</label>
+                                <label for="key" class="form-label d-flex align-items-center gap-2">
+                                    <i class="bi bi-music-note"></i> Key
+                                </label>
                                 <select class="form-select" id="key">
                                     <option value="C">C</option>
                                     <option value="G">G</option>
@@ -48,7 +56,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="parameter-group">
-                                <label for="scale" class="form-label">Scale</label>
+                                <label for="scale" class="form-label d-flex align-items-center gap-2">
+                                    <i class="bi bi-grid"></i> Scale
+                                </label>
                                 <select class="form-select" id="scale">
                                     <option value="major">Major</option>
                                     <option value="minor">Minor</option>
@@ -57,7 +67,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="parameter-group">
-                                <label for="octave" class="form-label">Octave</label>
+                                <label for="octave" class="form-label d-flex align-items-center gap-2">
+                                    <i class="bi bi-layers"></i> Octave
+                                </label>
                                 <select class="form-select" id="octave">
                                     <option value="3">Low (3)</option>
                                     <option value="4" selected>Middle (4)</option>
@@ -68,7 +80,9 @@
                     </div>
 
                     <div class="parameter-group mt-3">
-                        <label class="form-label d-block">Accompaniment</label>
+                        <label class="form-label d-block d-flex align-items-center gap-2">
+                            <i class="bi bi-music-player"></i> Accompaniment
+                        </label>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="enableChords" checked>
                             <label class="form-check-label" for="enableChords">Chords</label>
@@ -79,15 +93,15 @@
                         </div>
                     </div>
 
-                    <div class="progress mb-3">
+                    <div class="progress mb-4">
                         <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
                              role="progressbar" style="width: 0%"></div>
                     </div>
 
-                    <div class="row g-2">
+                    <div class="row g-3">
                         <div class="col-12">
                             <button id="generateBtn" class="btn btn-primary w-100 btn-icon">
-                                <i class="bi bi-music-note"></i> Generate New Music
+                                <i class="bi bi-magic"></i> Generate New Music
                             </button>
                         </div>
                         <div class="col-6">
@@ -96,7 +110,7 @@
                             </button>
                         </div>
                         <div class="col-6">
-                            <button id="stopBtn" class="btn btn-secondary w-100 btn-icon" disabled>
+                            <button id="stopBtn" class="btn btn-outline-secondary w-100 btn-icon" disabled>
                                 <i class="bi bi-stop-circle"></i> Stop
                             </button>
                         </div>
