@@ -21,8 +21,12 @@ def generate():
         key = request.args.get('key', 'C')
         scale = request.args.get('scale', 'major')
         tempo = int(request.args.get('tempo', 120))
+        base_octave = int(request.args.get('octave', 4))
+        enable_chords = request.args.get('enableChords', 'true') == 'true'
+        enable_drums = request.args.get('enableDrums', 'true') == 'true'
 
-        logging.debug(f"Generating MIDI with key={key}, scale={scale}, tempo={tempo}")
+        logging.debug(f"Generating MIDI with key={key}, scale={scale}, tempo={tempo}, "
+                     f"octave={base_octave}, chords={enable_chords}, drums={enable_drums}")
 
         # Generate MIDI file in temporary directory
         with tempfile.NamedTemporaryFile(suffix='.mid', delete=False) as temp_file:
@@ -31,7 +35,10 @@ def generate():
                 tempo=tempo,
                 key=key,
                 scale_type=scale,
-                length=32  # Extended length for longer compositions
+                base_octave=base_octave,
+                length=32,  # Extended length for longer compositions
+                enable_chords=enable_chords,
+                enable_drums=enable_drums
             )
             return send_file(
                 temp_file.name,

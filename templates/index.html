@@ -33,23 +33,50 @@
                         <div class="text-center" id="tempoValue">120 BPM</div>
                     </div>
 
-                    <div class="parameter-group">
-                        <label for="key" class="form-label">Key</label>
-                        <select class="form-select" id="key">
-                            <option value="C">C</option>
-                            <option value="G">G</option>
-                            <option value="D">D</option>
-                            <option value="A">A</option>
-                            <option value="E">E</option>
-                        </select>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="parameter-group">
+                                <label for="key" class="form-label">Key</label>
+                                <select class="form-select" id="key">
+                                    <option value="C">C</option>
+                                    <option value="G">G</option>
+                                    <option value="D">D</option>
+                                    <option value="A">A</option>
+                                    <option value="E">E</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="parameter-group">
+                                <label for="scale" class="form-label">Scale</label>
+                                <select class="form-select" id="scale">
+                                    <option value="major">Major</option>
+                                    <option value="minor">Minor</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="parameter-group">
+                                <label for="octave" class="form-label">Octave</label>
+                                <select class="form-select" id="octave">
+                                    <option value="3">Low (3)</option>
+                                    <option value="4" selected>Middle (4)</option>
+                                    <option value="5">High (5)</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="parameter-group">
-                        <label for="scale" class="form-label">Scale</label>
-                        <select class="form-select" id="scale">
-                            <option value="major">Major</option>
-                            <option value="minor">Minor</option>
-                        </select>
+                    <div class="parameter-group mt-3">
+                        <label class="form-label d-block">Accompaniment</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="enableChords" checked>
+                            <label class="form-check-label" for="enableChords">Chords</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="enableDrums" checked>
+                            <label class="form-check-label" for="enableDrums">Drums</label>
+                        </div>
                     </div>
 
                     <div class="progress mb-3">
