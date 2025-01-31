@@ -17,16 +17,13 @@ def get_scale(key='C', scale_type='major', octaves=2, base_octave=4):
         'minor': [2, 1, 2, 2, 1, 2, 2]
     }
 
-    # Find starting index for the key
     start_idx = notes.index(key)
     scale_notes = []
 
-    # Generate scale across specified octaves
     for octave in range(octaves):
         current_idx = start_idx
         octave_notes = []
 
-        # Generate one octave of notes
         for interval in intervals[scale_type]:
             note = notes[current_idx]
             octave_notes.append((note, base_octave + octave))
@@ -37,11 +34,22 @@ def get_scale(key='C', scale_type='major', octaves=2, base_octave=4):
     return scale_notes
 
 def get_chord_progression(scale_type='major'):
-    """Get a chord progression based on scale type."""
+    """Get varied chord progressions based on scale type."""
     if scale_type == 'major':
-        return [1, 4, 5, 1]  # I-IV-V-I progression
+        progressions = [
+            [1, 4, 5, 1],  # I-IV-V-I
+            [1, 6, 4, 5],  # I-vi-IV-V
+            [2, 5, 1, 6],  # ii-V-I-vi
+            [1, 5, 6, 4]   # I-V-vi-IV
+        ]
     else:
-        return [1, 6, 4, 5]  # i-vi-iv-v progression
+        progressions = [
+            [1, 6, 4, 5],  # i-vi-iv-v
+            [1, 4, 7, 5],  # i-iv-VII-v
+            [6, 4, 1, 5],  # vi-iv-i-v
+            [1, 7, 6, 5]   # i-VII-vi-v
+        ]
+    return random.choice(progressions)
 
 def note_to_midi_number(note, octave):
     """Convert a note name and octave to MIDI note number."""
@@ -49,25 +57,38 @@ def note_to_midi_number(note, octave):
              'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11}
     return 60 + notes[note] + (octave - 4) * 12
 
-def generate_drum_pattern(measures=8):
-    """Generate a basic drum pattern."""
+def generate_drum_pattern(measures=8, time_signature=4):
+    """Generate a more varied drum pattern."""
     pattern = []
-    for _ in range(measures):
-        # Basic pattern: kick on 1 and 3, snare on 2 and 4, hihat every beat
-        for beat in range(4):
-            if beat in [0, 2]:
-                pattern.append(('kick', beat * 1.0))
-            if beat in [1, 3]:
-                pattern.append(('snare', beat * 1.0))
-            pattern.append(('hihat', beat * 1.0))
-            pattern.append(('hihat', beat * 1.0 + 0.5))  # Add eighth notes
+    for measure in range(measures):
+        base_time = measure * time_signature
+
+        # Basic pattern variations
+        patterns = [
+            # Standard pattern
+            [('kick', 0), ('hihat', 0), ('snare', 1), ('hihat', 1),
+             ('kick', 2), ('hihat', 2), ('snare', 3), ('hihat', 3)],
+            # Syncopated pattern
+            [('kick', 0), ('hihat', 0.5), ('snare', 1), ('hihat', 1.5),
+             ('kick', 2), ('hihat', 2.5), ('snare', 3), ('hihat', 3.5)],
+            # Variation with extra kicks
+            [('kick', 0), ('hihat', 0), ('kick', 0.5), ('snare', 1),
+             ('hihat', 2), ('kick', 2.5), ('snare', 3), ('hihat', 3)]
+        ]
+
+        # Choose a random pattern for this measure
+        current_pattern = random.choice(patterns)
+
+        # Add the pattern with the correct timing offset
+        for drum, beat in current_pattern:
+            pattern.append((drum, base_time + beat))
+
     return pattern
 
 def generate_midi(filename, tempo=120, key='C', scale_type='major', base_octave=4, length=32, 
                  enable_chords=True, enable_drums=True):
     """Generate a MIDI file with melody, chords, and drums."""
-    # Create MIDI file with 3 tracks (melody, chords, drums)
-    midi = MIDIFile(3)
+    midi = MIDIFile(3)  # 3 tracks: melody, chords, drums
     time = 0
 
     # Setup tracks
@@ -76,11 +97,14 @@ def generate_midi(filename, tempo=120, key='C', scale_type='major', base_octave=
         # Set different instruments for each track
         midi.addProgramChange(track, 0, 0, 0 if track == 0 else 48 if track == 1 else 0)
 
-    # Get scale notes
+    # Get scale notes and total duration
     scale = get_scale(key, scale_type, octaves=2, base_octave=base_octave)
+    total_duration = 0
 
     # Track 0: Melody
     prev_note_idx = None
+    melody_times = []  # Store melody note timings for synchronization
+
     for i in range(length):
         if prev_note_idx is not None:
             possible_indices = list(range(max(0, prev_note_idx - 3), 
@@ -95,17 +119,24 @@ def generate_midi(filename, tempo=120, key='C', scale_type='major', base_octave=
 
         duration = random.choice([0.5, 1, 2])
         velocity = random.randint(85, 110)
+
         midi.addNote(0, 0, midi_note, time, duration, velocity)
+        melody_times.append((time, duration))
         time += duration
+        total_duration = max(total_duration, time)
 
     # Track 1: Chords (if enabled)
     if enable_chords:
-        time = 0
-        progression = get_chord_progression(scale_type)
-        chord_duration = 4  # One bar per chord
+        chord_time = 0
+        measures = int(total_duration / 4)  # 4 beats per measure
 
-        for _ in range(length // 4):
+        while chord_time < total_duration:
+            progression = get_chord_progression(scale_type)
+
             for chord_idx in progression:
+                if chord_time >= total_duration:
+                    break
+
                 # Build triad from scale degrees
                 root_idx = (chord_idx - 1) * 2
                 third_idx = root_idx + 2
@@ -119,15 +150,18 @@ def generate_midi(filename, tempo=120, key='C', scale_type='major', base_octave=
                     # Add chord notes
                     for note, oct in [(root_note, root_oct), (third_note, third_oct), (fifth_note, fifth_oct)]:
                         midi_note = note_to_midi_number(note, oct)
-                        midi.addNote(1, 0, midi_note, time, chord_duration, 70)
+                        midi.addNote(1, 0, midi_note, chord_time, 4, 70)
 
-                time += chord_duration
+                chord_time += 4  # One bar per chord
 
     # Track 2: Drums (if enabled)
     if enable_drums:
-        drum_pattern = generate_drum_pattern(measures=length//4)
+        measures = int(total_duration / 4)  # 4 beats per measure
+        drum_pattern = generate_drum_pattern(measures=measures)
+
         for drum, beat_time in drum_pattern:
-            midi.addNote(2, 9, DRUM_NOTES[drum], beat_time, 0.25, 100)
+            if beat_time < total_duration:  # Only add drum hits within the melody duration
+                midi.addNote(2, 9, DRUM_NOTES[drum], beat_time, 0.25, 100)
 
     # Write file
     with open(filename, "wb") as output_file:
