@@ -19,7 +19,7 @@ def get_scale(key='C', scale_type='major'):
         
     return scale
 
-def generate_midi(filename, tempo=120, key='C', scale_type='major', length=16):
+def generate_midi(filename, tempo=120, key='C', scale_type='major', length=32):
     """Generate a MIDI file with basic music theory rules."""
     # Create MIDI file with 1 track
     midi = MIDIFile(1)
@@ -33,17 +33,20 @@ def generate_midi(filename, tempo=120, key='C', scale_type='major', length=16):
     scale = get_scale(key, scale_type)
     base_note = 60  # Middle C
     
-    # Generate melody
+    # Generate melody with more variation
     for i in range(length):
         # Random note from scale
         note_idx = random.randint(0, len(scale) - 1)
         note = base_note + note_idx
         
-        # Random duration (quarter or eighth note)
-        duration = random.choice([1, 0.5])
+        # More varied durations (quarter, eighth, or half note)
+        duration = random.choice([0.5, 1, 2])
+        
+        # Vary velocity (volume) slightly for more natural sound
+        velocity = random.randint(90, 100)
         
         # Add note to track
-        midi.addNote(track, 0, note, time, duration, 100)
+        midi.addNote(track, 0, note, time, duration, velocity)
         time += duration
     
     # Write file

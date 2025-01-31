@@ -1,11 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const generateMidiBtn = document.getElementById('generateMidiBtn');
-    const generateMp3Btn = document.getElementById('generateMp3Btn');
-    const previewBtn = document.getElementById('previewBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const playBtn = document.getElementById('playBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
     const progressBar = document.getElementById('progressBar');
     const tempoSlider = document.getElementById('tempo');
     const tempoValue = document.getElementById('tempoValue');
+
     const synth = new Tone.PolySynth().toDestination();
+    let currentMelody = null;
+    let isPlaying = false;
 
     tempoSlider.addEventListener('input', (e) => {
         tempoValue.textContent = `${e.target.value} BPM`;
@@ -18,56 +22,91 @@ document.addEventListener('DOMContentLoaded', () => {
         genre: document.getElementById('genre').value
     });
 
-    const handleDownload = async (endpoint, format) => {
+    generateBtn.addEventListener('click', async () => {
         try {
-            generateMidiBtn.disabled = true;
-            generateMp3Btn.disabled = true;
+            generateBtn.disabled = true;
+            playBtn.disabled = true;
+            stopBtn.disabled = true;
+            downloadBtn.disabled = true;
             progressBar.style.width = '50%';
 
-            const response = await fetch(`/${endpoint}?${getParams().toString()}`, {
+            const response = await fetch(`/generate?${getParams().toString()}`, {
                 method: 'POST',
             });
 
             if (!response.ok) {
-                throw new Error(`Generation failed`);
+                throw new Error('Generation failed');
             }
 
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `generated_music.${format}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+            // Store the blob for later download
+            currentMelody = await response.blob();
 
             progressBar.style.width = '100%';
+            playBtn.disabled = false;
+            downloadBtn.disabled = false;
         } catch (error) {
             console.error('Error:', error);
-            alert(`Failed to generate ${format.toUpperCase()} file`);
+            alert('Failed to generate music');
         } finally {
-            generateMidiBtn.disabled = false;
-            generateMp3Btn.disabled = false;
+            generateBtn.disabled = false;
             setTimeout(() => {
                 progressBar.style.width = '0%';
             }, 1000);
         }
-    };
+    });
 
-    generateMidiBtn.addEventListener('click', () => handleDownload('generate', 'mid'));
-    generateMp3Btn.addEventListener('click', () => handleDownload('generate-mp3', 'mp3'));
+    playBtn.addEventListener('click', () => {
+        if (!isPlaying) {
+            const key = document.getElementById('key').value;
+            const scale = document.getElementById('scale').value;
+            const tempo = parseInt(document.getElementById('tempo').value);
 
-    previewBtn.addEventListener('click', () => {
-        const key = document.getElementById('key').value;
-        const scale = document.getElementById('scale').value;
-        const notes = scale === 'major' 
-            ? [`${key}4`, `${key}4`, `${key}5`, `${key}4`]
-            : [`${key}4`, `${key}4`, `${key}4`, `${key}3`];
+            // Create a simple preview melody based on the selected key and scale
+            const baseNote = key + '4';
+            const interval = scale === 'major' ? 4 : 3;
+            const notes = [
+                baseNote,
+                Tone.Frequency(baseNote).transpose(interval).toNote(),
+                Tone.Frequency(baseNote).transpose(7).toNote(),
+                baseNote
+            ];
 
-        const now = Tone.now();
-        notes.forEach((note, i) => {
-            synth.triggerAttackRelease(note, '8n', now + i * 0.5);
-        });
+            // Calculate note duration based on tempo
+            const noteDuration = 60 / tempo;
+
+            // Play the preview melody
+            const now = Tone.now();
+            notes.forEach((note, i) => {
+                synth.triggerAttackRelease(note, noteDuration, now + i * noteDuration);
+            });
+
+            isPlaying = true;
+            playBtn.innerHTML = '<i class="bi bi-pause-circle"></i> Pause';
+            stopBtn.disabled = false;
+        } else {
+            synth.releaseAll();
+            isPlaying = false;
+            playBtn.innerHTML = '<i class="bi bi-play-circle"></i> Play';
+        }
+    });
+
+    stopBtn.addEventListener('click', () => {
+        synth.releaseAll();
+        isPlaying = false;
+        playBtn.innerHTML = '<i class="bi bi-play-circle"></i> Play';
+        stopBtn.disabled = true;
+    });
+
+    downloadBtn.addEventListener('click', () => {
+        if (currentMelody) {
+            const url = window.URL.createObjectURL(currentMelody);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'generated_music.mid';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
     });
 });

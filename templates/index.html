@@ -59,18 +59,23 @@
 
                     <div class="row g-2">
                         <div class="col-12">
-                            <button id="previewBtn" class="btn btn-secondary w-100 btn-icon">
-                                <i class="bi bi-play-circle"></i> Preview
+                            <button id="generateBtn" class="btn btn-primary w-100 btn-icon">
+                                <i class="bi bi-music-note"></i> Generate New Music
                             </button>
                         </div>
-                        <div class="col-md-6">
-                            <button id="generateMidiBtn" class="btn btn-primary w-100 btn-icon">
-                                <i class="bi bi-file-earmark-music"></i> Download MIDI
+                        <div class="col-6">
+                            <button id="playBtn" class="btn btn-success w-100 btn-icon" disabled>
+                                <i class="bi bi-play-circle"></i> Play
                             </button>
                         </div>
-                        <div class="col-md-6">
-                            <button id="generateMp3Btn" class="btn btn-success w-100 btn-icon">
-                                <i class="bi bi-file-earmark-music"></i> Download MP3
+                        <div class="col-6">
+                            <button id="stopBtn" class="btn btn-secondary w-100 btn-icon" disabled>
+                                <i class="bi bi-stop-circle"></i> Stop
+                            </button>
+                        </div>
+                        <div class="col-12">
+                            <button id="downloadBtn" class="btn btn-info w-100 btn-icon" disabled>
+                                <i class="bi bi-download"></i> Download MIDI
                             </button>
                         </div>
                     </div>
