@@ -2,14 +2,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const generateBtn = document.getElementById('generateBtn');
     const previewBtn = document.getElementById('previewBtn');
     const progressBar = document.getElementById('progressBar');
+    const tempoSlider = document.getElementById('tempo');
+    const tempoValue = document.getElementById('tempoValue');
     const synth = new Tone.PolySynth().toDestination();
+
+    tempoSlider.addEventListener('input', (e) => {
+        tempoValue.textContent = `${e.target.value} BPM`;
+    });
 
     generateBtn.addEventListener('click', async () => {
         try {
             generateBtn.disabled = true;
             progressBar.style.width = '50%';
 
-            const response = await fetch('/generate', {
+            const params = new URLSearchParams({
+                key: document.getElementById('key').value,
+                scale: document.getElementById('scale').value,
+                tempo: document.getElementById('tempo').value,
+                genre: document.getElementById('genre').value
+            });
+
+            const response = await fetch(`/generate?${params.toString()}`, {
                 method: 'POST',
             });
 
@@ -40,9 +53,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     previewBtn.addEventListener('click', () => {
-        // Simple preview melody using Tone.js
+        const key = document.getElementById('key').value;
+        const scale = document.getElementById('scale').value;
+        const notes = scale === 'major' 
+            ? [`${key}4`, `${key}4`, `${key}5`, `${key}4`]
+            : [`${key}4`, `${key}4`, `${key}4`, `${key}3`];
+
         const now = Tone.now();
-        const notes = ['C4', 'E4', 'G4', 'B4'];
         notes.forEach((note, i) => {
             synth.triggerAttackRelease(note, '8n', now + i * 0.5);
         });
