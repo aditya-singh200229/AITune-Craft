@@ -19,7 +19,8 @@ def get_scale(key='C', scale_type='major', octaves=2, base_octave=4):
     notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
     intervals = {
         'major': [2, 2, 1, 2, 2, 2, 1],
-        'minor': [2, 1, 2, 2, 1, 2, 2]
+        'minor': [2, 1, 2, 2, 1, 2, 2],
+        'raag bhairav':[1, 3, 1, 2, 1, 3, 1]
     }
 
     start_idx = notes.index(key)
