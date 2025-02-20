@@ -180,3 +180,25 @@ def generate_midi(filename, tempo=120, key='C', scale_type='major', base_octave=
     # Write file
     with open(filename, "wb") as output_file:
         midi.writeFile(output_file)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
