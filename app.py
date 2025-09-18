@@ -36,7 +36,7 @@ def generate():
                 key=key,
                 scale_type=scale,
                 base_octave=base_octave,
-                length=64,  # Extended length for longer compositions
+                length=64,  # duration for composition
                 enable_chords=enable_chords,
                 enable_drums=enable_drums
             )
